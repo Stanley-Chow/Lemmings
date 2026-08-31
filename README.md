@@ -1,84 +1,84 @@
-# Lemmings 2D: An Interactive Game Engine in C++
+# Lemmings Game Engine
 
-Welcome to the official repository for **Lemmings 2D**, a complete graphical grid-based video game engine written from scratch in modern C++. This project implements an interactive ecosystem featuring dynamic pathfinding, structural mechanics, tool placement systems, and a fully real-time simulation loop.
+A C++17, tick-driven puzzle-game simulation built around an extensible actor
+hierarchy. The implementation coordinates autonomous characters, hazards,
+interactive tools, level progression, scoring, and deterministic per-tick
+cleanup on a 20¡Á20 grid.
 
----
+This is a coursework-based portfolio project. I implemented the gameplay model
+in `Actor.h`, `Actor.cpp`, `StudentWorld.h`, and `StudentWorld.cpp`; the
+application framework and runtime assets were supplied with the assignment.
+See [Third-party material and authorship](THIRD_PARTY_NOTICE.md) for the exact
+boundary.
 
-## Project Architecture Overview
+## What the implementation demonstrates
 
-The system architecture utilizes polymorphism to model game components dynamically. The engine operates on an elegant inheritance hierarchy to orchestrate life cycles, spatial movement, collisions, and entity rendering inside a real-time game world.
+- **Polymorphic actor model:** floor bricks, factories, lemmings, monsters,
+  exits, hazards, traversal aids, directional doors, pheromones, and the
+  placement cursor share a common lifecycle.
+- **Explicit character state machine:** lemmings transition among walking,
+  falling, climbing, and bouncing states while tracking fall distance, bounce
+  height, direction, and action timing.
+- **World-mediated interactions:** actors query `StudentWorld` for collision,
+  climbing, targeting, freezing, burning, bouncing, saving, and tool placement
+  instead of directly owning one another.
+- **Safe entity lifecycle:** dead actors are marked during simulation and
+  deleted after the update pass, avoiding iterator invalidation.
+- **Data-driven levels:** level text files define the board layout and available
+  tools; the world maps each symbol to its corresponding actor type.
+
+## Architecture
 
 ```text
-â”œâ”€â”€ src/
-â”‚   â”œâ”€â”€ Actor.h / .cpp       # Polymorphic base class and concrete game objects
-â”‚   â”œâ”€â”€ StudentWorld.h/.cpp  # Game world manager; handles simulation logic and grid interactions
-â”‚   â”œâ”€â”€ GameConstants.h      # Directional macros, sound constants, and asset specifications
-â”‚   â”œâ”€â”€ provided.h           # Core engine definitions, framework hooks, and base utilities
-â”‚   â””â”€â”€ provided.cpp         # Low-level rendering layer and asset loader engine
-â”œâ”€â”€ assets/
-â”‚   â””â”€â”€ levels/              # Text files (.txt) containing structural grid layouts
-â””â”€â”€ main.cpp                 # Game runtime driver initialization shell
+Game framework
+  ©¸©¤ StudentWorld
+       ©À©¤ owns and updates Actor instances
+       ©À©¤ loads levels and tracks score/time/lives
+       ©¸©¤ mediates actor-to-actor interactions
 
+Actor
+  ©À©¤ Static/reactive: FloorBrick, Exit, Trampoline, Spring, Net,
+  ©¦                   Pheromone, OneWayDoor, Bonfire
+  ©À©¤ Autonomous:      LemmingFactory, Lemming, IceMonster
+  ©¸©¤ Input-driven:    Cursor
 ```
 
----
+## Build
 
-## Core Architectural Engine (`provided.h` / `provided.cpp`)
+Requirements:
 
-The foundational mechanics, runtime graphics loop, window configurations, and asset indexing pipelines are encapsulated cleanly inside the pre-configured backend utilities defined in `provided.h` and `provided.cpp`. This high-performance subsystem abstractly manages the complex underlying engine loops so that the gameplay architecture remains separate and clean.
+- CMake 3.21 or newer
+- A C++17 compiler
+- [vcpkg](https://github.com/microsoft/vcpkg) with `VCPKG_ROOT` set
 
-### Key Functionalities Managed Inside the Core Subsystem:
+PowerShell:
 
-* **Abstract Base Hooks & Game Control Interfaces**: Defines pure virtual template trees (such as the base world wrapper and display controllers) to bind gameplay assets seamlessly to the underlying system loop.
-* **Low-Level Graphical Layer & Asset Loader**: Manages the cross-platform rendering context. It loads standard structural level files (`.txt`), tracks resource paths, draws sprite data matrices to the screen buffer in real-time, and refreshes the graphics context at fixed time steps.
-* **Sound & Event Synthesizer Infrastructure**: Houses the system hooks to trigger event sound effects (`SOUND_LEMMING_DIE`, `SOUND_LEVEL_COMPLETED`, etc.) across individual gameplay contexts.
-* **Input Peripherals Hook Layer**: Tracks key presses (such as cursor movements and action selections) and pushes active keyboard coordinates straight down to the application layer.
-
----
-
-## Engine Pipelines & Gameplay Subsystems
-
-### 1. Object-Oriented Polymorphic Game Objects (`Actor`)
-
-To keep individual entities lightweight and scalable, the game uses a structured inheritance hierarchy rooted in a base `Actor` object.
-
-* **Shared Attributes**: Every entity tracks active 2D grid coordinates, structural type flags, image state variables, and directional indices.
-* **Dynamic Lifecycle Execution**: An abstract `doSomething()` interface enforces unique state machine logic for each object during every execution pass of the game loop.
-* **Sub-Systems Implemented**: Includes specialized actors like basic Lemmings, blocks/terrain obstacles, exits, trap doors, and interactive tools.
-
-### 2. The Simulation Manager (`StudentWorld`)
-
-The container environment acts as the central coordinator for the runtime environment:
-
-1. **Level Setup (`init`)**: Parses text layout templates, dynamically creates and stores structural game objects, and positions coordinates.
-2. **Real-Time Frame Tick (`move`)**: Prompts every active entity to execute its state machine logic, sweeps away destroyed objects via cleanup sweeps, updates dashboard score summaries, and checks win conditions.
-3. **Resource Destruction (`cleanUp`)**: Safely deallocates all remaining actor pointers on the heap whenever a level transitions, preventing memory leaks.
-
-### 3. State-Machine AI Pathfinding
-
-The game characters utilize autonomous algorithmic rules to explore the environment:
-
-* **Gravity & Terminal Fall Bounds**: Evaluates step-down trajectories each frame. If a character falls beyond maximum structural damage limits, death procedures execute automatically.
-* **Directional Traversal & Obstacle Check**: Tests front-facing grid locations for walls, reversing horizontal steps immediately upon tracking blocked paths.
-
----
-
-## Compilation & Verification
-
-The codebase requires a modern compiler supporting standard C++11 or higher, alongside dependencies configured within the graphics project ecosystem.
-
-### Build and Compilation
-
-```bash
-g++ -std=c++17 src/StudentWorld.cpp src/Actor.cpp src/provided.cpp main.cpp -o LemmingsGame -lglut -lGL -lGLU
-
+```powershell
+cmake -S . -B build `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+cmake --build build --config Release
+Set-Location build/Release
+./lemmings.exe
 ```
 
-### Running the Project
+For a single-config generator, run the executable from its output directory
+(for example, `./build/lemmings`). CMake copies `Assets/` beside the executable
+after every successful build.
 
-Ensure that all level layouts are stored inside your asset tracking directories before initializing the executable runtime:
+## Controls
 
-```bash
-./LemmingsGame
+- Arrow keys: move the placement cursor
+- `T`: place a trampoline
+- `N`: place a climbing net
+- `P`: place a pheromone
+- `S`: place a spring
+- `<` / `>`: place a one-way door
 
-```
+A placement succeeds only on an empty cell and when that tool remains in the
+current level's inventory.
+
+## Repository hygiene
+
+Build output, dependency installations, IDE-specific settings, local property
+sheets, archives, and debug symbols are intentionally excluded. Dependencies
+are declared in `vcpkg.json` instead of being committed.

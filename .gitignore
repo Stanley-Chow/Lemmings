@@ -1,0 +1,34 @@
+# CMake
+/build*/
+/out/
+/cmake-build-*/
+CMakeUserPresets.json
+
+# Visual Studio
+/.vs/
+/x64/
+/Debug/
+/Release/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.props
+
+# Compiled artifacts
+*.exe
+*.dll
+*.lib
+*.obj
+*.pdb
+*.ilk
+*.tlog
+*.log
+
+# Local dependency installs and archives
+/vcpkg_installed/
+*.zip
+
+# OS/editor files
+.DS_Store
+Thumbs.db
