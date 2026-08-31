@@ -1,57 +1,80 @@
 # Lemmings Game Engine
 
-A C++17, tick-driven puzzle-game simulation built around an extensible actor
-hierarchy. The implementation coordinates autonomous characters, hazards,
-interactive tools, level progression, scoring, and deterministic per-tick
-cleanup on a 20¡Á20 grid.
+![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus&logoColor=white)
+![CMake](https://img.shields.io/badge/build-CMake-064F8C?logo=cmake&logoColor=white)
+![SFML](https://img.shields.io/badge/graphics-SFML-8CC445)
 
-I implemented the gameplay model in `Actor.h`, `Actor.cpp`, `StudentWorld.h`,
-and `StudentWorld.cpp`. The application framework and runtime assets were
-provided as project support material. See
-[Third-party material and authorship](THIRD_PARTY_NOTICE.md) for the exact
-boundary.
+A tick-driven puzzle-game simulation written in C++17. The engine coordinates
+autonomous characters, environmental hazards, interactive tools, scoring, and
+level progression on a data-driven 20 x 20 grid.
 
-## What the implementation demonstrates
+## Highlights
 
-- **Polymorphic actor model:** floor bricks, factories, lemmings, monsters,
-  exits, hazards, traversal aids, directional doors, pheromones, and the
-  placement cursor share a common lifecycle.
-- **Explicit character state machine:** lemmings transition among walking,
-  falling, climbing, and bouncing states while tracking fall distance, bounce
-  height, direction, and action timing.
-- **World-mediated interactions:** actors query `StudentWorld` for collision,
-  climbing, targeting, freezing, burning, bouncing, saving, and tool placement
-  instead of directly owning one another.
-- **Safe entity lifecycle:** dead actors are marked during simulation and
-  deleted after the update pass, avoiding iterator invalidation.
-- **Data-driven levels:** level text files define the board layout and available
-  tools; the world maps each symbol to its corresponding actor type.
+| System | Implementation |
+| --- | --- |
+| Actor model | Polymorphic hierarchy for characters, terrain, hazards, tools, and input |
+| Character behavior | Explicit walking, falling, climbing, and bouncing state machine |
+| World simulation | Deterministic tick loop with deferred entity cleanup |
+| Interactions | Collision, freezing, burning, bouncing, saving, targeting, and placement |
+| Levels | Text-based layouts mapped to actor types at runtime |
 
 ## Architecture
 
 ```text
-Game framework
-  ©¸©¤ StudentWorld
-       ©À©¤ owns and updates Actor instances
-       ©À©¤ loads levels and tracks score/time/lives
-       ©¸©¤ mediates actor-to-actor interactions
-
-Actor
-  ©À©¤ Static/reactive: FloorBrick, Exit, Trampoline, Spring, Net,
-  ©¦                   Pheromone, OneWayDoor, Bonfire
-  ©À©¤ Autonomous:      LemmingFactory, Lemming, IceMonster
-  ©¸©¤ Input-driven:    Cursor
+GameController
+`-- StudentWorld
+    |-- loads levels and tracks score, time, and lives
+    |-- owns and updates Actor instances
+    |-- mediates actor-to-actor interactions
+    `-- Actor
+        |-- Static/reactive
+        |   `-- FloorBrick, Exit, Trampoline, Spring, Net,
+        |       Pheromone, OneWayDoor, Bonfire
+        |-- Autonomous
+        |   `-- LemmingFactory, Lemming, IceMonster
+        `-- Input-driven
+            `-- Cursor
 ```
 
-## Build
+`StudentWorld` acts as the simulation boundary. Actors query the world for
+collisions and interactions instead of owning or mutating one another directly.
+Entities marked dead during a tick are removed after the update pass, preserving
+iterator validity.
 
-Requirements:
+## Gameplay systems
+
+- Factories spawn lemmings on a timed schedule.
+- Lemmings walk, fall, climb nets, bounce from springs and trampolines, and
+  respond to pheromones.
+- Ice monsters patrol supported terrain and eliminate nearby lemmings.
+- Bonfires, exits, one-way doors, and player-placed tools alter movement and
+  survival.
+- Level completion combines saved-lemming requirements, remaining entities,
+  lives, score, and a countdown timer.
+
+## Controls
+
+| Input | Action |
+| --- | --- |
+| Arrow keys | Move the placement cursor |
+| `T` | Place a trampoline |
+| `N` | Place a climbing net |
+| `P` | Place a pheromone |
+| `S` | Place a spring |
+| `<` / `>` | Place a one-way door |
+
+A tool can be placed only on an empty cell and when it remains in the current
+level's inventory.
+
+## Build and run
+
+### Requirements
 
 - CMake 3.21 or newer
 - A C++17 compiler
 - [vcpkg](https://github.com/microsoft/vcpkg) with `VCPKG_ROOT` set
 
-PowerShell:
+### Windows / PowerShell
 
 ```powershell
 cmake -S . -B build `
@@ -61,24 +84,30 @@ Set-Location build/Release
 ./lemmings.exe
 ```
 
-For a single-config generator, run the executable from its output directory
-(for example, `./build/lemmings`). CMake copies `Assets/` beside the executable
-after every successful build.
+The vcpkg manifest resolves SFML 3. CMake copies the runtime assets and required
+dynamic libraries beside the executable after a successful build.
 
-## Controls
+## Repository layout
 
-- Arrow keys: move the placement cursor
-- `T`: place a trampoline
-- `N`: place a climbing net
-- `P`: place a pheromone
-- `S`: place a spring
-- `<` / `>`: place a one-way door
+| Path | Purpose |
+| --- | --- |
+| `Actor.h`, `Actor.cpp` | Actor hierarchy and gameplay behavior |
+| `StudentWorld.h`, `StudentWorld.cpp` | World lifecycle, level loading, interactions, and scoring |
+| `Assets/` | Level definitions and runtime media |
+| `CMakeLists.txt` | Portable C++17 build configuration |
+| `vcpkg.json` | SFML dependency manifest |
 
-A placement succeeds only on an empty cell and when that tool remains in the
-current level's inventory.
+## Implementation scope
 
-## Repository hygiene
+My gameplay implementation is contained in `Actor.h`, `Actor.cpp`,
+`StudentWorld.h`, and `StudentWorld.cpp`. The surrounding application framework
+and runtime assets were provided as project support material and are not
+represented as original work. See [Third-party material and
+authorship](THIRD_PARTY_NOTICE.md) for details.
 
-Build output, dependency installations, IDE-specific settings, local property
-sheets, archives, and debug symbols are intentionally excluded. Dependencies
-are declared in `vcpkg.json` instead of being committed.
+## Validation
+
+- Windows x64 Release build
+- CMake configuration with SFML 3.0.2
+- Runtime dependency and asset packaging
+- Launch smoke test
