@@ -5,10 +5,7 @@
 #include <string>
 using namespace std;
 
-  // If your program is having trouble finding the Assets directory,
-  // replace the string literal with a full path name to the directory,
-  // e.g., "C:/CS32/Lemmings/Assets" or "/Users/fred/cs32/Lemmings/Assets"
-
+// CMake copies the Assets directory beside the executable.
 const string assetDirectory = "./Assets";
 
 class GameWorld;

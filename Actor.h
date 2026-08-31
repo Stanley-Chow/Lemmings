@@ -3,22 +3,7 @@
 
 #include "GraphObject.h"
 
-// Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
-//
-/////////////////////////////////////////////////////////////////////////////////////
-// Part 1 Work Area
-// We need Actor (Base), FloorBrick (Derived) and IceMonster (Derived)
-/////////////////////////////////////////////////////////////////////////////////////
-// Part 2 Work Area
-// Right now, we get to work on our Part 2 header file, and we nned to update some method
-// for classes we just built for Part 1.
-// An important note that:
-// we will not make doSomething trivial for some classes, i.e. Spring, Trampoline, Exit, etc.
-// because they are not completely inactive. They are reactive, which means they do nothing
-// until some other character steps on them. So we will make doSomething for them
-// to check if there is a lemming stepping on them and then react accordingly.
-
-// We just want to make sure that our codes are well organized and precise
+// Gameplay actor hierarchy and behavior contracts.
 
 class StudentWorld;
 

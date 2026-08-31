@@ -5,10 +5,10 @@ hierarchy. The implementation coordinates autonomous characters, hazards,
 interactive tools, level progression, scoring, and deterministic per-tick
 cleanup on a 20¡Á20 grid.
 
-This is a coursework-based portfolio project. I implemented the gameplay model
-in `Actor.h`, `Actor.cpp`, `StudentWorld.h`, and `StudentWorld.cpp`; the
-application framework and runtime assets were supplied with the assignment.
-See [Third-party material and authorship](THIRD_PARTY_NOTICE.md) for the exact
+I implemented the gameplay model in `Actor.h`, `Actor.cpp`, `StudentWorld.h`,
+and `StudentWorld.cpp`. The application framework and runtime assets were
+provided as project support material. See
+[Third-party material and authorship](THIRD_PARTY_NOTICE.md) for the exact
 boundary.
 
 ## What the implementation demonstrates

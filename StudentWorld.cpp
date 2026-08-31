@@ -11,9 +11,6 @@ GameWorld* createStudentWorld(string assetPath)
     return new StudentWorld(assetPath);
 }
 
-// Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
-// Do not change or remove the createStudentWorld implementation above.
-
 StudentWorld::StudentWorld(string assetPath)
 	: GameWorld(assetPath),
       m_cursor(nullptr),

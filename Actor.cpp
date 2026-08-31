@@ -1,15 +1,7 @@
 #include "Actor.h"
 #include "StudentWorld.h"
 
-// Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
-//
-/////////////////////////////////////////////////////////////////////////////////////
-// Part 1 Work Area
-// We need Actor (Base), FloorBrick (Derived) and IceMonster (Derived)
-/////////////////////////////////////////////////////////////////////////////////////
-// Part 2 Work Area
-// We happen here is: we need to update a few methods and a few new class
-// As a result, we will not distinguish the Part 1 and Part 2 with a clear boundary line
+// Gameplay actor implementations.
 /////////////////////////////////////////////////////////////////////////////////////
 
 
